@@ -1,0 +1,2651 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet.photon.css">
+
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/leaflet-svg-shape-markers.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet.photon.js"></script>
+        <script src="data/MangLuoiCapNuoc_L_6.js"></script>
+        <script src="data/MangLuoiCapThongTin_L_7.js"></script>
+        <script src="data/MangLuoiChieuSang_L_8.js"></script>
+        <script src="data/MangLuoiPhanPhoiDien_L_9.js"></script>
+        <script src="data/CongTrinhCapDien_P_10.js"></script>
+        <script src="data/CongtrinhCapNuocPCCC_P_11.js"></script>
+        <script src="data/CongTrinhThongTin_P_12.js"></script>
+        <script src="data/CongTrinhChieuSang_P_13.js"></script>
+        <script src="data/Tuynthotncthi_14.js"></script>
+        <script src="data/Bovmitrng_15.js"></script>
+        <script src="data/Hngthotncthi_16.js"></script>
+        <script src="data/CngtrnhTNTvVSMT_17.js"></script>
+        <script src="data/Cngthotncthi_18.js"></script>
+        <script src="data/Hngthotncma_19.js"></script>
+        <script src="data/Tuynthotncma_20.js"></script>
+        <script src="data/Cngthotncma_21.js"></script>
+        <script src="data/CngtrnhCBKT_22.js"></script>
+        <script src="data/ChcnngSDD_23.js"></script>
+        <script src="data/Timng_24.js"></script>
+        <script src="data/Bva_25.js"></script>
+        <script src="data/Chgiixydng_26.js"></script>
+        <script src="data/Chcnngcngtrnh_27.js"></script>
+        <script src="data/Cngtrnh_28.js"></script>
+        <script src="data/Cyxanh_29.js"></script>
+        <script src="data/Ranhdnlinquan_30.js"></script>
+        <script src="data/Ranhquyhoch_31.js"></script>
+        <script src="data/ngngmc_32.js"></script>
+        <script src="data/immcgii_33.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:false, maxZoom:24, minZoom:8
+        })
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        // remove popup's row if "visible-with-data"
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        // add class to format popup if it contains media
+		function addClassToPopupIfMedia(content, popup) {
+			var tempDiv = document.createElement('div');
+			tempDiv.innerHTML = content;
+			if (tempDiv.querySelector('td img')) {
+				popup._contentNode.classList.add('media');
+					// Delay to force the redraw
+					setTimeout(function() {
+						popup.update();
+					}, 10);
+			} else {
+				popup._contentNode.classList.remove('media');
+			}
+		}
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+       
+
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+            if (bounds_group.getLayers().length) {
+                map.fitBounds(bounds_group.getBounds());
+            }
+        }
+        map.createPane('pane_OpenStreetMap_0');
+        map.getPane('pane_OpenStreetMap_0').style.zIndex = 400;
+        var layer_OpenStreetMap_0 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            pane: 'pane_OpenStreetMap_0',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 8,
+            maxZoom: 24,
+            minNativeZoom: 0,
+            maxNativeZoom: 19
+        });
+        layer_OpenStreetMap_0;
+        map.addLayer(layer_OpenStreetMap_0);
+        map.createPane('pane_GoogleSatellite_1');
+        map.getPane('pane_GoogleSatellite_1').style.zIndex = 401;
+        var layer_GoogleSatellite_1 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleSatellite_1',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 8,
+            maxZoom: 24,
+            minNativeZoom: 0,
+            maxNativeZoom: 25
+        });
+        layer_GoogleSatellite_1;
+
+////////////////////////////////////// Add layers
+// Add Geotiff layers
+///// Geotiff bản đồ tổng hợp đường ống
+        map.addLayer(layer_GoogleSatellite_1);
+        map.createPane('pane_BDQUYHOACHTONGHOPDUONGONG_2');
+        map.getPane('pane_BDQUYHOACHTONGHOPDUONGONG_2').style.zIndex = 403;
+        var img_BDQUYHOACHTONGHOPDUONGONG_2 = 'data/BDQUYHOACHTONGHOPDUONGONG_2.png';
+        var img_bounds_BDQUYHOACHTONGHOPDUONGONG_2 = [[10.16636286651885,105.92250223836979],[10.17398452575418,105.93336436803548]];
+        var layer_BDQUYHOACHTONGHOPDUONGONG_2 = new L.imageOverlay(img_BDQUYHOACHTONGHOPDUONGONG_2,
+                                              img_bounds_BDQUYHOACHTONGHOPDUONGONG_2,
+                                              {pane: 'pane_BDQUYHOACHTONGHOPDUONGONG_2'});
+        bounds_group.addLayer(layer_BDQUYHOACHTONGHOPDUONGONG_2);
+///// Geotiff bản đồ không gian kiến trúc cảnh quan
+        map.createPane('pane_BDKHONGGIANKIENTRUCCANHQUAN_3');
+        map.getPane('pane_BDKHONGGIANKIENTRUCCANHQUAN_3').style.zIndex = 404;
+        var img_BDKHONGGIANKIENTRUCCANHQUAN_3 = 'data/BDKHONGGIANKIENTRUCCANHQUAN_3.png';
+        var img_bounds_BDKHONGGIANKIENTRUCCANHQUAN_3 = [[10.166840727760876,105.92277964760501],[10.174459248586878,105.93364135724535]];
+        var layer_BDKHONGGIANKIENTRUCCANHQUAN_3 = new L.imageOverlay(img_BDKHONGGIANKIENTRUCCANHQUAN_3,
+                                              img_bounds_BDKHONGGIANKIENTRUCCANHQUAN_3,
+                                              {pane: 'pane_BDKHONGGIANKIENTRUCCANHQUAN_3'});
+        bounds_group.addLayer(layer_BDKHONGGIANKIENTRUCCANHQUAN_3);
+///// Geotiff bản đồ đánh giá hiện trạng
+        map.createPane('pane_BDDANHGIAHIENTRANG_5');
+        map.getPane('pane_BDDANHGIAHIENTRANG_5').style.zIndex = 402;
+        var img_BDDANHGIAHIENTRANG_5 = 'data/BDDANHGIAHIENTRANG_5.png';
+        var img_bounds_BDDANHGIAHIENTRANG_5 = [[10.16590651921409,105.92314301271783],[10.17352737578194,105.93400399844911]];
+        var layer_BDDANHGIAHIENTRANG_5 = new L.imageOverlay(img_BDDANHGIAHIENTRANG_5,
+                                              img_bounds_BDDANHGIAHIENTRANG_5,
+                                              {pane: 'pane_BDDANHGIAHIENTRANG_5'});
+        bounds_group.addLayer(layer_BDDANHGIAHIENTRANG_5);
+///// Geotiff bản đồ quy hoạch SDD
+        map.createPane('pane_BDQUYHOACHSDD_4');
+        map.getPane('pane_BDQUYHOACHSDD_4').style.zIndex = 405;
+        var img_BDQUYHOACHSDD_4 = 'data/BDQUYHOACHSDD_4.png';
+        var img_bounds_BDQUYHOACHSDD_4 = [[10.166839657716578,105.92277957167087],[10.174459380100027,105.93364112730457]];
+        var layer_BDQUYHOACHSDD_4 = new L.imageOverlay(img_BDQUYHOACHSDD_4,
+                                              img_bounds_BDQUYHOACHSDD_4,
+                                              {pane: 'pane_BDQUYHOACHSDD_4'});
+        bounds_group.addLayer(layer_BDQUYHOACHSDD_4);
+        map.addLayer(layer_BDQUYHOACHSDD_4);
+
+// Add Nendiahinh&Vitri&Mocgioi Layers
+///// Layer Ranh dự án liên quan
+        function pop_Ranhdnlinquan_30(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">phanLoai</th>\
+                        <td class="visible-with-data" id="phanLoai">' + (feature.properties['phanLoai'] !== null ? autolinker.link(String(feature.properties['phanLoai']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Ranhdnlinquan_30_0(feature) {
+            switch(String(feature.properties['phanLoai'])) {
+                case 'Ranh QHC':
+                    return {
+                pane: 'pane_Ranhdnlinquan_30',
+                opacity: 1,
+                color: 'rgba(255,127,0,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Ranh QHCT (Cũ)':
+                    return {
+                pane: 'pane_Ranhdnlinquan_30',
+                opacity: 1,
+                color: 'rgba(77,175,74,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Ranhdnlinquan_30');
+        map.getPane('pane_Ranhdnlinquan_30').style.zIndex = 406;
+        map.getPane('pane_Ranhdnlinquan_30').style['mix-blend-mode'] = 'normal';
+        var layer_Ranhdnlinquan_30 = new L.geoJson(json_Ranhdnlinquan_30, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Ranhdnlinquan_30',
+            layerName: 'layer_Ranhdnlinquan_30',
+            pane: 'pane_Ranhdnlinquan_30',
+            onEachFeature: pop_Ranhdnlinquan_30,
+            style: style_Ranhdnlinquan_30_0,
+        });
+        bounds_group.addLayer(layer_Ranhdnlinquan_30);
+        map.addLayer(layer_Ranhdnlinquan_30);
+
+///// Layer Ranh quy hoạch
+        function pop_Ranhquyhoch_31(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ghiChu</th>\
+                        <td class="visible-with-data" id="ghiChu">' + (feature.properties['ghiChu'] !== null ? autolinker.link(String(feature.properties['ghiChu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">dienTich</th>\
+                        <td class="visible-with-data" id="dienTich">' + (feature.properties['dienTich'] !== null ? autolinker.link(String(feature.properties['dienTich']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">danSoHH</th>\
+                        <td class="visible-with-data" id="danSoHH">' + (feature.properties['danSoHH'] !== null ? autolinker.link(String(feature.properties['danSoHH']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">danSoQH</th>\
+                        <td class="visible-with-data" id="danSoQH">' + (feature.properties['danSoQH'] !== null ? autolinker.link(String(feature.properties['danSoQH']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">chuDauTu</th>\
+                        <td class="visible-with-data" id="chuDauTu">' + (feature.properties['chuDauTu'] !== null ? autolinker.link(String(feature.properties['chuDauTu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">donViTVTK</th>\
+                        <td class="visible-with-data" id="donViTVTK">' + (feature.properties['donViTVTK'] !== null ? autolinker.link(String(feature.properties['donViTVTK']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">soQD</th>\
+                        <td class="visible-with-data" id="soQD">' + (feature.properties['soQD'] !== null ? autolinker.link(String(feature.properties['soQD']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">coQuanPD</th>\
+                        <td class="visible-with-data" id="coQuanPD">' + (feature.properties['coQuanPD'] !== null ? autolinker.link(String(feature.properties['coQuanPD']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ngayDuyet</th>\
+                        <td class="visible-with-data" id="ngayDuyet">' + (feature.properties['ngayDuyet'] !== null ? autolinker.link(String(feature.properties['ngayDuyet']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Ranhquyhoch_31_0() {
+            return {
+                pane: 'pane_Ranhquyhoch_31',
+                opacity: 1,
+                color: 'rgba(228,26,28,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Ranhquyhoch_31');
+        map.getPane('pane_Ranhquyhoch_31').style.zIndex = 407;
+        map.getPane('pane_Ranhquyhoch_31').style['mix-blend-mode'] = 'normal';
+        var layer_Ranhquyhoch_31 = new L.geoJson(json_Ranhquyhoch_31, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Ranhquyhoch_31',
+            layerName: 'layer_Ranhquyhoch_31',
+            pane: 'pane_Ranhquyhoch_31',
+            onEachFeature: pop_Ranhquyhoch_31,
+            style: style_Ranhquyhoch_31_0,
+        });
+        bounds_group.addLayer(layer_Ranhquyhoch_31);
+        map.addLayer(layer_Ranhquyhoch_31);
+///// Layer đường đồng mức
+        function pop_ngngmc_32(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">phanLoai</th>\
+                        <td class="visible-with-data" id="phanLoai">' + (feature.properties['phanLoai'] !== null ? autolinker.link(String(feature.properties['phanLoai']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ghiChu</th>\
+                        <td class="visible-with-data" id="ghiChu">' + (feature.properties['ghiChu'] !== null ? autolinker.link(String(feature.properties['ghiChu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_ngngmc_32_0(feature) {
+            switch(String(feature.properties['phanLoai'])) {
+                case 'Đồng mức cái':
+                    return {
+                pane: 'pane_ngngmc_32',
+                opacity: 1,
+                color: 'rgba(163,51,36,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+                case 'Đồng mức con':
+                    return {
+                pane: 'pane_ngngmc_32',
+                opacity: 1,
+                color: 'rgba(128,131,122,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_ngngmc_32');
+        map.getPane('pane_ngngmc_32').style.zIndex = 408;
+        map.getPane('pane_ngngmc_32').style['mix-blend-mode'] = 'normal';
+        var layer_ngngmc_32 = new L.geoJson(json_ngngmc_32, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_ngngmc_32',
+            layerName: 'layer_ngngmc_32',
+            pane: 'pane_ngngmc_32',
+            onEachFeature: pop_ngngmc_32,
+            style: style_ngngmc_32_0,
+        });
+        bounds_group.addLayer(layer_ngngmc_32);
+   
+///// Layer điểm mốc giới
+        function pop_immcgii_33(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">toaDoX</th>\
+                        <td class="visible-with-data" id="toaDoX">' + (feature.properties['toaDoX'] !== null ? autolinker.link(String(feature.properties['toaDoX']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">toaDoY</th>\
+                        <td class="visible-with-data" id="toaDoY">' + (feature.properties['toaDoY'] !== null ? autolinker.link(String(feature.properties['toaDoY']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_immcgii_33_0() {
+            return {
+                pane: 'pane_immcgii_33',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(255,255,255,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,0,0,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_immcgii_33');
+        map.getPane('pane_immcgii_33').style.zIndex = 433;
+        map.getPane('pane_immcgii_33').style['mix-blend-mode'] = 'normal';
+        var layer_immcgii_33 = new L.geoJson(json_immcgii_33, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_immcgii_33',
+            layerName: 'layer_immcgii_33',
+            pane: 'pane_immcgii_33',
+            onEachFeature: pop_immcgii_33,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_immcgii_33_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_immcgii_33);
+        map.addLayer(layer_immcgii_33);
+
+// Add SDD&GT Layers
+///// Layer chức năng sử dụng đất
+        function pop_ChcnngSDD_23(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">maOPho</th>\
+                        <td class="visible-with-data" id="maOPho">' + (feature.properties['maOPho'] !== null ? autolinker.link(String(feature.properties['maOPho']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">phanLoai</th>\
+                        <td class="visible-with-data" id="phanLoai">' + (feature.properties['phanLoai'] !== null ? autolinker.link(String(feature.properties['phanLoai']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ghiChu</th>\
+                        <td class="visible-with-data" id="ghiChu">' + (feature.properties['ghiChu'] !== null ? autolinker.link(String(feature.properties['ghiChu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">maQuyUoc</th>\
+                        <td class="visible-with-data" id="maQuyUoc">' + (feature.properties['maQuyUoc'] !== null ? autolinker.link(String(feature.properties['maQuyUoc']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">dienTich</th>\
+                        <td class="visible-with-data" id="dienTich">' + (feature.properties['dienTich'] !== null ? autolinker.link(String(feature.properties['dienTich']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">danSo</th>\
+                        <td class="visible-with-data" id="danSo">' + (feature.properties['danSo'] !== null ? autolinker.link(String(feature.properties['danSo']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">tangCao</th>\
+                        <td class="visible-with-data" id="tangCao">' + (feature.properties['tangCao'] !== null ? autolinker.link(String(feature.properties['tangCao']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">matDo</th>\
+                        <td class="visible-with-data" id="matDo">' + (feature.properties['matDo'] !== null ? autolinker.link(String(feature.properties['matDo']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">heSoSDD</th>\
+                        <td class="visible-with-data" id="heSoSDD">' + (feature.properties['heSoSDD'] !== null ? autolinker.link(String(feature.properties['heSoSDD']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">soLo</th>\
+                        <td class="visible-with-data" id="soLo">' + (feature.properties['soLo'] !== null ? autolinker.link(String(feature.properties['soLo']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_ChcnngSDD_23_0(feature) {
+            switch(String(feature.properties['phanLoai'])) {
+                case 'Bãi đỗ xe':
+                    return {
+                pane: 'pane_ChcnngSDD_23',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(151,151,151,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Đất cây xanh sử dụng công cộng':
+                    return {
+                pane: 'pane_ChcnngSDD_23',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(110,221,0,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Đất cây xanh sử dụng hạn chế':
+                    return {
+                pane: 'pane_ChcnngSDD_23',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,184,0,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Đất chưa sử dụng (đất bằng, đồi núi chưa sử dụng)':
+                    return {
+                pane: 'pane_ChcnngSDD_23',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(219,219,219,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Đất công trình hạ tầng kỹ thuật khác':
+                    return {
+                pane: 'pane_ChcnngSDD_23',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(86,56,114,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Đất công trình hạ tầng xã hội':
+                    return {
+                pane: 'pane_ChcnngSDD_23',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(221,0,0,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Đất đường giao thông':
+                    return {
+                pane: 'pane_ChcnngSDD_23',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(117,117,117,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Đất nhà chung cư':
+                    return {
+                pane: 'pane_ChcnngSDD_23',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,191,0,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Đất nhà ở liền kề':
+                    return {
+                pane: 'pane_ChcnngSDD_23',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(221,110,0,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Đất thể dục thể thao':
+                    return {
+                pane: 'pane_ChcnngSDD_23',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,184,0,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Đất trung tâm nghiên cứu, đào tạo (Trường cao đẳng, đại học, học viện, cơ sở dạy nghề, cơ sở đào tạo khác)':
+                    return {
+                pane: 'pane_ChcnngSDD_23',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,137,184,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Hồ, ao, đầm':
+                    return {
+                pane: 'pane_ChcnngSDD_23',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(7,95,185,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_ChcnngSDD_23');
+        map.getPane('pane_ChcnngSDD_23').style.zIndex = 409;
+        map.getPane('pane_ChcnngSDD_23').style['mix-blend-mode'] = 'normal';
+        var layer_ChcnngSDD_23 = new L.geoJson(json_ChcnngSDD_23, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_ChcnngSDD_23',
+            layerName: 'layer_ChcnngSDD_23',
+            pane: 'pane_ChcnngSDD_23',
+            onEachFeature: pop_ChcnngSDD_23,
+            style: style_ChcnngSDD_23_0,
+        });
+        bounds_group.addLayer(layer_ChcnngSDD_23);
+        map.addLayer(layer_ChcnngSDD_23);
+
+///// Layer Tim đường giao thông
+        function pop_Timng_24(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">loGioi</th>\
+                        <td class="visible-with-data" id="loGioi">' + (feature.properties['loGioi'] !== null ? autolinker.link(String(feature.properties['loGioi']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">chieuDai</th>\
+                        <td class="visible-with-data" id="chieuDai">' + (feature.properties['chieuDai'] !== null ? autolinker.link(String(feature.properties['chieuDai']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">longDuong</th>\
+                        <td class="visible-with-data" id="longDuong">' + (feature.properties['longDuong'] !== null ? autolinker.link(String(feature.properties['longDuong']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">viaTrai</th>\
+                        <td class="visible-with-data" id="viaTrai">' + (feature.properties['viaTrai'] !== null ? autolinker.link(String(feature.properties['viaTrai']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">viaPhai</th>\
+                        <td class="visible-with-data" id="viaPhai">' + (feature.properties['viaPhai'] !== null ? autolinker.link(String(feature.properties['viaPhai']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Timng_24_0() {
+            return {
+                pane: 'pane_Timng_24',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Timng_24');
+        map.getPane('pane_Timng_24').style.zIndex = 410;
+        map.getPane('pane_Timng_24').style['mix-blend-mode'] = 'normal';
+        var layer_Timng_24 = new L.geoJson(json_Timng_24, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Timng_24',
+            layerName: 'layer_Timng_24',
+            pane: 'pane_Timng_24',
+            onEachFeature: pop_Timng_24,
+            style: style_Timng_24_0,
+        });
+        bounds_group.addLayer(layer_Timng_24);
+        map.addLayer(layer_Timng_24);
+
+/////Layer bó vỉa dãy phân cách
+        function pop_Bva_25(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Bva_25_0() {
+            return {
+                pane: 'pane_Bva_25',
+                opacity: 1,
+                color: 'rgba(255,0,219,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Bva_25');
+        map.getPane('pane_Bva_25').style.zIndex = 411;
+        map.getPane('pane_Bva_25').style['mix-blend-mode'] = 'normal';
+        var layer_Bva_25 = new L.geoJson(json_Bva_25, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Bva_25',
+            layerName: 'layer_Bva_25',
+            pane: 'pane_Bva_25',
+            onEachFeature: pop_Bva_25,
+            style: style_Bva_25_0,
+        });
+        bounds_group.addLayer(layer_Bva_25);
+
+///// Layer chỉ giới xây dựng
+        function pop_Chgiixydng_26(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Chgiixydng_26_0(feature) {
+            switch(String(feature.properties['tenDoiTuon'])) {
+                case 'Khoảng lùi 0m':
+                    return {
+                pane: 'pane_Chgiixydng_26',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Khoảng lùi 10m':
+                    return {
+                pane: 'pane_Chgiixydng_26',
+                opacity: 1,
+                color: 'rgba(51,160,44,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Khoảng lùi 2m':
+                    return {
+                pane: 'pane_Chgiixydng_26',
+                opacity: 1,
+                color: 'rgba(7,95,185,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Khoảng lùi 5m':
+                    return {
+                pane: 'pane_Chgiixydng_26',
+                opacity: 1,
+                color: 'rgba(0,221,207,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Khoảng lùi 6m':
+                    return {
+                pane: 'pane_Chgiixydng_26',
+                opacity: 1,
+                color: 'rgba(255,255,0,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Chgiixydng_26');
+        map.getPane('pane_Chgiixydng_26').style.zIndex = 412;
+        map.getPane('pane_Chgiixydng_26').style['mix-blend-mode'] = 'normal';
+        var layer_Chgiixydng_26 = new L.geoJson(json_Chgiixydng_26, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Chgiixydng_26',
+            layerName: 'layer_Chgiixydng_26',
+            pane: 'pane_Chgiixydng_26',
+            onEachFeature: pop_Chgiixydng_26,
+            style: style_Chgiixydng_26_0,
+        });
+        bounds_group.addLayer(layer_Chgiixydng_26);
+
+///// Layer điểm chức năng công trình
+        function pop_Chcnngcngtrnh_27(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">phanLoai</th>\
+                        <td class="visible-with-data" id="phanLoai">' + (feature.properties['phanLoai'] !== null ? autolinker.link(String(feature.properties['phanLoai']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ghiChu</th>\
+                        <td class="visible-with-data" id="ghiChu">' + (feature.properties['ghiChu'] !== null ? autolinker.link(String(feature.properties['ghiChu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Chcnngcngtrnh_27_0() {
+            return {
+                pane: 'pane_Chcnngcngtrnh_27',
+                radius: 2.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(227,26,28,1.0)',
+                interactive: false,
+            }
+        }
+        map.createPane('pane_Chcnngcngtrnh_27');
+        map.getPane('pane_Chcnngcngtrnh_27').style.zIndex = 432;
+        map.getPane('pane_Chcnngcngtrnh_27').style['mix-blend-mode'] = 'normal';
+        var layer_Chcnngcngtrnh_27 = new L.geoJson(json_Chcnngcngtrnh_27, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Chcnngcngtrnh_27',
+            layerName: 'layer_Chcnngcngtrnh_27',
+            pane: 'pane_Chcnngcngtrnh_27',
+            onEachFeature: pop_Chcnngcngtrnh_27,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Chcnngcngtrnh_27_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Chcnngcngtrnh_27);
+        map.addLayer(layer_Chcnngcngtrnh_27);
+
+// Add HTKT Khac Layers
+///// Layer mạng lưới cấp nước
+        function pop_MangLuoiCapNuoc_L_6(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">phanLoai</th>\
+                        <td class="visible-with-data" id="phanLoai">' + (feature.properties['phanLoai'] !== null ? autolinker.link(String(feature.properties['phanLoai']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ghiChu</th>\
+                        <td class="visible-with-data" id="ghiChu">' + (feature.properties['ghiChu'] !== null ? autolinker.link(String(feature.properties['ghiChu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">chatLieu</th>\
+                        <td class="visible-with-data" id="chatLieu">' + (feature.properties['chatLieu'] !== null ? autolinker.link(String(feature.properties['chatLieu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">duongKinh</th>\
+                        <td class="visible-with-data" id="duongKinh">' + (feature.properties['duongKinh'] !== null ? autolinker.link(String(feature.properties['duongKinh']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">chieuDai</th>\
+                        <td class="visible-with-data" id="chieuDai">' + (feature.properties['chieuDai'] !== null ? autolinker.link(String(feature.properties['chieuDai']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_MangLuoiCapNuoc_L_6_0() {
+            return {
+                pane: 'pane_MangLuoiCapNuoc_L_6',
+                opacity: 1,
+                color: 'rgba(21,26,216,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_MangLuoiCapNuoc_L_6');
+        map.getPane('pane_MangLuoiCapNuoc_L_6').style.zIndex = 413;
+        map.getPane('pane_MangLuoiCapNuoc_L_6').style['mix-blend-mode'] = 'normal';
+        var layer_MangLuoiCapNuoc_L_6 = new L.geoJson(json_MangLuoiCapNuoc_L_6, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_MangLuoiCapNuoc_L_6',
+            layerName: 'layer_MangLuoiCapNuoc_L_6',
+            pane: 'pane_MangLuoiCapNuoc_L_6',
+            onEachFeature: pop_MangLuoiCapNuoc_L_6,
+            style: style_MangLuoiCapNuoc_L_6_0,
+        });
+        bounds_group.addLayer(layer_MangLuoiCapNuoc_L_6);
+
+///// Layer mạng lưới cấp thông tin
+        function pop_MangLuoiCapThongTin_L_7(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">phanLoai</th>\
+                        <td class="visible-with-data" id="phanLoai">' + (feature.properties['phanLoai'] !== null ? autolinker.link(String(feature.properties['phanLoai']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ghiChu</th>\
+                        <td class="visible-with-data" id="ghiChu">' + (feature.properties['ghiChu'] !== null ? autolinker.link(String(feature.properties['ghiChu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_MangLuoiCapThongTin_L_7_0() {
+            return {
+                pane: 'pane_MangLuoiCapThongTin_L_7',
+                opacity: 1,
+                color: 'rgba(223,56,202,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_MangLuoiCapThongTin_L_7');
+        map.getPane('pane_MangLuoiCapThongTin_L_7').style.zIndex = 414;
+        map.getPane('pane_MangLuoiCapThongTin_L_7').style['mix-blend-mode'] = 'normal';
+        var layer_MangLuoiCapThongTin_L_7 = new L.geoJson(json_MangLuoiCapThongTin_L_7, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_MangLuoiCapThongTin_L_7',
+            layerName: 'layer_MangLuoiCapThongTin_L_7',
+            pane: 'pane_MangLuoiCapThongTin_L_7',
+            onEachFeature: pop_MangLuoiCapThongTin_L_7,
+            style: style_MangLuoiCapThongTin_L_7_0,
+        });
+        bounds_group.addLayer(layer_MangLuoiCapThongTin_L_7);
+
+///// Layer mạng lưới chiếu sáng
+        function pop_MangLuoiChieuSang_L_8(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">phanLoai</th>\
+                        <td class="visible-with-data" id="phanLoai">' + (feature.properties['phanLoai'] !== null ? autolinker.link(String(feature.properties['phanLoai']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ghiChu</th>\
+                        <td class="visible-with-data" id="ghiChu">' + (feature.properties['ghiChu'] !== null ? autolinker.link(String(feature.properties['ghiChu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_MangLuoiChieuSang_L_8_0() {
+            return {
+                pane: 'pane_MangLuoiChieuSang_L_8',
+                opacity: 1,
+                color: 'rgba(245,251,47,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_MangLuoiChieuSang_L_8');
+        map.getPane('pane_MangLuoiChieuSang_L_8').style.zIndex = 415;
+        map.getPane('pane_MangLuoiChieuSang_L_8').style['mix-blend-mode'] = 'normal';
+        var layer_MangLuoiChieuSang_L_8 = new L.geoJson(json_MangLuoiChieuSang_L_8, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_MangLuoiChieuSang_L_8',
+            layerName: 'layer_MangLuoiChieuSang_L_8',
+            pane: 'pane_MangLuoiChieuSang_L_8',
+            onEachFeature: pop_MangLuoiChieuSang_L_8,
+            style: style_MangLuoiChieuSang_L_8_0,
+        });
+        bounds_group.addLayer(layer_MangLuoiChieuSang_L_8);
+  
+///// Layer mạng lưới phân phối điện
+        function pop_MangLuoiPhanPhoiDien_L_9(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">phanLoai</th>\
+                        <td class="visible-with-data" id="phanLoai">' + (feature.properties['phanLoai'] !== null ? autolinker.link(String(feature.properties['phanLoai']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ghiChu</th>\
+                        <td class="visible-with-data" id="ghiChu">' + (feature.properties['ghiChu'] !== null ? autolinker.link(String(feature.properties['ghiChu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_MangLuoiPhanPhoiDien_L_9_0(feature) {
+            switch(String(feature.properties['phanLoai'])) {
+                case 'Tuyến điện ngầm hạ thế':
+                    return {
+                pane: 'pane_MangLuoiPhanPhoiDien_L_9',
+                opacity: 1,
+                color: 'rgba(227,26,28,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Tuyến điện ngầm trung thế':
+                    return {
+                pane: 'pane_MangLuoiPhanPhoiDien_L_9',
+                opacity: 1,
+                color: 'rgba(255,127,0,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'Tuyến điện nổi trung thế':
+                    return {
+                pane: 'pane_MangLuoiPhanPhoiDien_L_9',
+                opacity: 1,
+                color: 'rgba(255,127,0,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_MangLuoiPhanPhoiDien_L_9');
+        map.getPane('pane_MangLuoiPhanPhoiDien_L_9').style.zIndex = 416;
+        map.getPane('pane_MangLuoiPhanPhoiDien_L_9').style['mix-blend-mode'] = 'normal';
+        var layer_MangLuoiPhanPhoiDien_L_9 = new L.geoJson(json_MangLuoiPhanPhoiDien_L_9, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_MangLuoiPhanPhoiDien_L_9',
+            layerName: 'layer_MangLuoiPhanPhoiDien_L_9',
+            pane: 'pane_MangLuoiPhanPhoiDien_L_9',
+            onEachFeature: pop_MangLuoiPhanPhoiDien_L_9,
+            style: style_MangLuoiPhanPhoiDien_L_9_0,
+        });
+        bounds_group.addLayer(layer_MangLuoiPhanPhoiDien_L_9);
+
+///// Layer Công trình cấp điện
+        function pop_CongTrinhCapDien_P_10(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">phanLoai</th>\
+                        <td class="visible-with-data" id="phanLoai">' + (feature.properties['phanLoai'] !== null ? autolinker.link(String(feature.properties['phanLoai']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ghiChu</th>\
+                        <td class="visible-with-data" id="ghiChu">' + (feature.properties['ghiChu'] !== null ? autolinker.link(String(feature.properties['ghiChu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_CongTrinhCapDien_P_10_0(feature) {
+            switch(String(feature.properties['phanLoai'])) {
+                case 'Trạm hạ thế':
+                    return {
+                pane: 'pane_CongTrinhCapDien_P_10',
+                shape: 'square',
+                radius: 12.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(231,12,12,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Tủ điện':
+                    return {
+                pane: 'pane_CongTrinhCapDien_P_10',
+                radius: 6.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(216,176,48,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_CongTrinhCapDien_P_10');
+        map.getPane('pane_CongTrinhCapDien_P_10').style.zIndex = 417;
+        map.getPane('pane_CongTrinhCapDien_P_10').style['mix-blend-mode'] = 'normal';
+        var layer_CongTrinhCapDien_P_10 = new L.geoJson(json_CongTrinhCapDien_P_10, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_CongTrinhCapDien_P_10',
+            layerName: 'layer_CongTrinhCapDien_P_10',
+            pane: 'pane_CongTrinhCapDien_P_10',
+            onEachFeature: pop_CongTrinhCapDien_P_10,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.shapeMarker(latlng, style_CongTrinhCapDien_P_10_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_CongTrinhCapDien_P_10);
+
+///// Layer Công trình cấp nước
+        function pop_CongtrinhCapNuocPCCC_P_11(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">phanLoai</th>\
+                        <td class="visible-with-data" id="phanLoai">' + (feature.properties['phanLoai'] !== null ? autolinker.link(String(feature.properties['phanLoai']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ghiChu</th>\
+                        <td class="visible-with-data" id="ghiChu">' + (feature.properties['ghiChu'] !== null ? autolinker.link(String(feature.properties['ghiChu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_CongtrinhCapNuocPCCC_P_11_0(feature) {
+            switch(String(feature.properties['phanLoai'])) {
+                case 'Đài nước, bể nước':
+                    return {
+                pane: 'pane_CongtrinhCapNuocPCCC_P_11',
+                radius: 12.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(77,29,223,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Trạm bơm tăng áp':
+                    return {
+                pane: 'pane_CongtrinhCapNuocPCCC_P_11',
+                shape: 'triangle',
+                radius: 12.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(21,26,216,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Trụ cứu hỏa':
+                    return {
+                pane: 'pane_CongtrinhCapNuocPCCC_P_11',
+                radius: 6.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(231,12,64,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_CongtrinhCapNuocPCCC_P_11');
+        map.getPane('pane_CongtrinhCapNuocPCCC_P_11').style.zIndex = 418;
+        map.getPane('pane_CongtrinhCapNuocPCCC_P_11').style['mix-blend-mode'] = 'normal';
+        var layer_CongtrinhCapNuocPCCC_P_11 = new L.geoJson(json_CongtrinhCapNuocPCCC_P_11, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_CongtrinhCapNuocPCCC_P_11',
+            layerName: 'layer_CongtrinhCapNuocPCCC_P_11',
+            pane: 'pane_CongtrinhCapNuocPCCC_P_11',
+            onEachFeature: pop_CongtrinhCapNuocPCCC_P_11,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.shapeMarker(latlng, style_CongtrinhCapNuocPCCC_P_11_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_CongtrinhCapNuocPCCC_P_11);
+
+ ////// Layer công trình cấp thông tin
+        function pop_CongTrinhThongTin_P_12(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">phanLoai</th>\
+                        <td class="visible-with-data" id="phanLoai">' + (feature.properties['phanLoai'] !== null ? autolinker.link(String(feature.properties['phanLoai']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ghiChu</th>\
+                        <td class="visible-with-data" id="ghiChu">' + (feature.properties['ghiChu'] !== null ? autolinker.link(String(feature.properties['ghiChu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_CongTrinhThongTin_P_12_0(feature) {
+            switch(String(feature.properties['phanLoai'])) {
+                case 'Cột Ăn ten':
+                    return {
+                pane: 'pane_CongTrinhThongTin_P_12',
+                shape: 'square',
+                radius: 12.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(79,207,69,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Tủ phối quang':
+                    return {
+                pane: 'pane_CongTrinhThongTin_P_12',
+                shape: 'square',
+                radius: 6.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(129,231,65,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_CongTrinhThongTin_P_12');
+        map.getPane('pane_CongTrinhThongTin_P_12').style.zIndex = 419;
+        map.getPane('pane_CongTrinhThongTin_P_12').style['mix-blend-mode'] = 'normal';
+        var layer_CongTrinhThongTin_P_12 = new L.geoJson(json_CongTrinhThongTin_P_12, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_CongTrinhThongTin_P_12',
+            layerName: 'layer_CongTrinhThongTin_P_12',
+            pane: 'pane_CongTrinhThongTin_P_12',
+            onEachFeature: pop_CongTrinhThongTin_P_12,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.shapeMarker(latlng, style_CongTrinhThongTin_P_12_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_CongTrinhThongTin_P_12);
+
+
+///// Layer công trình chiếu sáng
+        function pop_CongTrinhChieuSang_P_13(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">phanLoai</th>\
+                        <td class="visible-with-data" id="phanLoai">' + (feature.properties['phanLoai'] !== null ? autolinker.link(String(feature.properties['phanLoai']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ghiChu</th>\
+                        <td class="visible-with-data" id="ghiChu">' + (feature.properties['ghiChu'] !== null ? autolinker.link(String(feature.properties['ghiChu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_CongTrinhChieuSang_P_13_0() {
+            return {
+                pane: 'pane_CongTrinhChieuSang_P_13',
+                radius: 6.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(245,251,47,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_CongTrinhChieuSang_P_13');
+        map.getPane('pane_CongTrinhChieuSang_P_13').style.zIndex = 420;
+        map.getPane('pane_CongTrinhChieuSang_P_13').style['mix-blend-mode'] = 'normal';
+        var layer_CongTrinhChieuSang_P_13 = new L.geoJson(json_CongTrinhChieuSang_P_13, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_CongTrinhChieuSang_P_13',
+            layerName: 'layer_CongTrinhChieuSang_P_13',
+            pane: 'pane_CongTrinhChieuSang_P_13',
+            onEachFeature: pop_CongTrinhChieuSang_P_13,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_CongTrinhChieuSang_P_13_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_CongTrinhChieuSang_P_13);
+
+// Add TNT & VSMT Layers
+///// Layer tuyến thoát nước thải
+        function pop_Tuynthotncthi_14(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ghiChu</th>\
+                        <td class="visible-with-data" id="ghiChu">' + (feature.properties['ghiChu'] !== null ? autolinker.link(String(feature.properties['ghiChu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">chatLieu</th>\
+                        <td class="visible-with-data" id="chatLieu">' + (feature.properties['chatLieu'] !== null ? autolinker.link(String(feature.properties['chatLieu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">duongKinh</th>\
+                        <td class="visible-with-data" id="duongKinh">' + (feature.properties['duongKinh'] !== null ? autolinker.link(String(feature.properties['duongKinh']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">chieuDai</th>\
+                        <td class="visible-with-data" id="chieuDai">' + (feature.properties['chieuDai'] !== null ? autolinker.link(String(feature.properties['chieuDai']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">doDoc</th>\
+                        <td class="visible-with-data" id="doDoc">' + (feature.properties['doDoc'] !== null ? autolinker.link(String(feature.properties['doDoc']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+
+        function style_Tuynthotncthi_14_0() {
+            return {
+                pane: 'pane_Tuynthotncthi_14',
+                opacity: 1,
+                color: 'rgba(41,105,13,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Tuynthotncthi_14');
+        map.getPane('pane_Tuynthotncthi_14').style.zIndex = 421;
+        map.getPane('pane_Tuynthotncthi_14').style['mix-blend-mode'] = 'normal';
+        var layer_Tuynthotncthi_14 = new L.geoJson(json_Tuynthotncthi_14, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Tuynthotncthi_14',
+            layerName: 'layer_Tuynthotncthi_14',
+            pane: 'pane_Tuynthotncthi_14',
+            onEachFeature: pop_Tuynthotncthi_14,
+            style: style_Tuynthotncthi_14_0,
+        });
+        bounds_group.addLayer(layer_Tuynthotncthi_14);
+
+///// Layer công trình môi trường dạng tuyến
+        function pop_Bovmitrng_15(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">phanLoai</th>\
+                        <td class="visible-with-data" id="phanLoai">' + (feature.properties['phanLoai'] !== null ? autolinker.link(String(feature.properties['phanLoai']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Bovmitrng_15_0() {
+            return {
+                pane: 'pane_Bovmitrng_15',
+                opacity: 1,
+                color: 'rgba(238,243,48,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Bovmitrng_15');
+        map.getPane('pane_Bovmitrng_15').style.zIndex = 422;
+        map.getPane('pane_Bovmitrng_15').style['mix-blend-mode'] = 'normal';
+        var layer_Bovmitrng_15 = new L.geoJson(json_Bovmitrng_15, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Bovmitrng_15',
+            layerName: 'layer_Bovmitrng_15',
+            pane: 'pane_Bovmitrng_15',
+            onEachFeature: pop_Bovmitrng_15,
+            style: style_Bovmitrng_15_0,
+        });
+        bounds_group.addLayer(layer_Bovmitrng_15);
+
+///// Layer hướng thoát nước thải
+        function pop_Hngthotncthi_16(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Hngthotncthi_16_0() {
+            return {
+                pane: 'pane_Hngthotncthi_16',
+                opacity: 1,
+                color: 'rgba(219,128,0,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Hngthotncthi_16');
+        map.getPane('pane_Hngthotncthi_16').style.zIndex = 423;
+        map.getPane('pane_Hngthotncthi_16').style['mix-blend-mode'] = 'normal';
+        var layer_Hngthotncthi_16 = new L.geoJson(json_Hngthotncthi_16, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Hngthotncthi_16',
+            layerName: 'layer_Hngthotncthi_16',
+            pane: 'pane_Hngthotncthi_16',
+            onEachFeature: pop_Hngthotncthi_16,
+            style: style_Hngthotncthi_16_0,
+        });
+        bounds_group.addLayer(layer_Hngthotncthi_16);
+
+///// Layer công trình TNMT&VSMT
+        function pop_CngtrnhTNTvVSMT_17(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">maQuyUoc</th>\
+                        <td class="visible-with-data" id="maQuyUoc">' + (feature.properties['maQuyUoc'] !== null ? autolinker.link(String(feature.properties['maQuyUoc']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">phanLoai</th>\
+                        <td class="visible-with-data" id="phanLoai">' + (feature.properties['phanLoai'] !== null ? autolinker.link(String(feature.properties['phanLoai']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ghiChu</th>\
+                        <td class="visible-with-data" id="ghiChu">' + (feature.properties['ghiChu'] !== null ? autolinker.link(String(feature.properties['ghiChu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_CngtrnhTNTvVSMT_17_0(feature) {
+            switch(String(feature.properties['phanLoai'])) {
+                case 'Điểm trung chuyển CTR':
+                    return {
+                pane: 'pane_CngtrnhTNTvVSMT_17',
+                radius: 10.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(13,180,95,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Trạm xử lý nước thải':
+                    return {
+                pane: 'pane_CngtrnhTNTvVSMT_17',
+                radius: 10.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(168,83,225,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_CngtrnhTNTvVSMT_17');
+        map.getPane('pane_CngtrnhTNTvVSMT_17').style.zIndex = 424;
+        map.getPane('pane_CngtrnhTNTvVSMT_17').style['mix-blend-mode'] = 'normal';
+        var layer_CngtrnhTNTvVSMT_17 = new L.geoJson(json_CngtrnhTNTvVSMT_17, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_CngtrnhTNTvVSMT_17',
+            layerName: 'layer_CngtrnhTNTvVSMT_17',
+            pane: 'pane_CngtrnhTNTvVSMT_17',
+            onEachFeature: pop_CngtrnhTNTvVSMT_17,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.shapeMarker(latlng, style_CngtrnhTNTvVSMT_17_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_CngtrnhTNTvVSMT_17);
+
+
+///// Layer công trình thoát nước thải
+        function pop_Cngthotncthi_18(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ghiChu</th>\
+                        <td class="visible-with-data" id="ghiChu">' + (feature.properties['ghiChu'] !== null ? autolinker.link(String(feature.properties['ghiChu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">caoDoTN</th>\
+                        <td class="visible-with-data" id="caoDoTN">' + (feature.properties['caoDoTN'] !== null ? autolinker.link(String(feature.properties['caoDoTN']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">caoDoXD</th>\
+                        <td class="visible-with-data" id="caoDoXD">' + (feature.properties['caoDoXD'] !== null ? autolinker.link(String(feature.properties['caoDoXD']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Cngthotncthi_18_0() {
+            return {
+                pane: 'pane_Cngthotncthi_18',
+                shape: 'square',
+                radius: 6.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(125,77,17,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Cngthotncthi_18');
+        map.getPane('pane_Cngthotncthi_18').style.zIndex = 425;
+        map.getPane('pane_Cngthotncthi_18').style['mix-blend-mode'] = 'normal';
+        var layer_Cngthotncthi_18 = new L.geoJson(json_Cngthotncthi_18, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Cngthotncthi_18',
+            layerName: 'layer_Cngthotncthi_18',
+            pane: 'pane_Cngthotncthi_18',
+            onEachFeature: pop_Cngthotncthi_18,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.shapeMarker(latlng, style_Cngthotncthi_18_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Cngthotncthi_18);
+
+// Add CBKT Layers
+///// Layer hướng thoát nước mưa
+        function pop_Hngthotncma_19(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Hngthotncma_19_0() {
+            return {
+                pane: 'pane_Hngthotncma_19',
+                opacity: 1,
+                color: 'rgba(0,23,192,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Hngthotncma_19');
+        map.getPane('pane_Hngthotncma_19').style.zIndex = 426;
+        map.getPane('pane_Hngthotncma_19').style['mix-blend-mode'] = 'normal';
+        var layer_Hngthotncma_19 = new L.geoJson(json_Hngthotncma_19, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Hngthotncma_19',
+            layerName: 'layer_Hngthotncma_19',
+            pane: 'pane_Hngthotncma_19',
+            onEachFeature: pop_Hngthotncma_19,
+            style: style_Hngthotncma_19_0,
+        });
+        bounds_group.addLayer(layer_Hngthotncma_19);
+
+///// Layer tuyến thoát nước mưa
+        function pop_Tuynthotncma_20(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ghiChu</th>\
+                        <td class="visible-with-data" id="ghiChu">' + (feature.properties['ghiChu'] !== null ? autolinker.link(String(feature.properties['ghiChu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">chatLieu</th>\
+                        <td class="visible-with-data" id="chatLieu">' + (feature.properties['chatLieu'] !== null ? autolinker.link(String(feature.properties['chatLieu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">duongKinh</th>\
+                        <td class="visible-with-data" id="duongKinh">' + (feature.properties['duongKinh'] !== null ? autolinker.link(String(feature.properties['duongKinh']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">chieuDai</th>\
+                        <td class="visible-with-data" id="chieuDai">' + (feature.properties['chieuDai'] !== null ? autolinker.link(String(feature.properties['chieuDai']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">doDoc</th>\
+                        <td class="visible-with-data" id="doDoc">' + (feature.properties['doDoc'] !== null ? autolinker.link(String(feature.properties['doDoc']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Tuynthotncma_20_0() {
+            return {
+                pane: 'pane_Tuynthotncma_20',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Tuynthotncma_20');
+        map.getPane('pane_Tuynthotncma_20').style.zIndex = 427;
+        map.getPane('pane_Tuynthotncma_20').style['mix-blend-mode'] = 'normal';
+        var layer_Tuynthotncma_20 = new L.geoJson(json_Tuynthotncma_20, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Tuynthotncma_20',
+            layerName: 'layer_Tuynthotncma_20',
+            pane: 'pane_Tuynthotncma_20',
+            onEachFeature: pop_Tuynthotncma_20,
+            style: style_Tuynthotncma_20_0,
+        });
+        bounds_group.addLayer(layer_Tuynthotncma_20);
+
+///// Layer cống thoát nước mưa
+        function pop_Cngthotncma_21(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ghiChu</th>\
+                        <td class="visible-with-data" id="ghiChu">' + (feature.properties['ghiChu'] !== null ? autolinker.link(String(feature.properties['ghiChu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">caoDoTN</th>\
+                        <td class="visible-with-data" id="caoDoTN">' + (feature.properties['caoDoTN'] !== null ? autolinker.link(String(feature.properties['caoDoTN']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">caoDoXD</th>\
+                        <td class="visible-with-data" id="caoDoXD">' + (feature.properties['caoDoXD'] !== null ? autolinker.link(String(feature.properties['caoDoXD']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Cngthotncma_21_0() {
+            return {
+                pane: 'pane_Cngthotncma_21',
+                shape: 'square',
+                radius: 6.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,23,192,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Cngthotncma_21');
+        map.getPane('pane_Cngthotncma_21').style.zIndex = 428;
+        map.getPane('pane_Cngthotncma_21').style['mix-blend-mode'] = 'normal';
+        var layer_Cngthotncma_21 = new L.geoJson(json_Cngthotncma_21, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Cngthotncma_21',
+            layerName: 'layer_Cngthotncma_21',
+            pane: 'pane_Cngthotncma_21',
+            onEachFeature: pop_Cngthotncma_21,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.shapeMarker(latlng, style_Cngthotncma_21_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Cngthotncma_21);
+
+///// Layer công trình CBKT
+        function pop_CngtrnhCBKT_22(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">phanLoai</th>\
+                        <td class="visible-with-data" id="phanLoai">' + (feature.properties['phanLoai'] !== null ? autolinker.link(String(feature.properties['phanLoai']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ghiChu</th>\
+                        <td class="visible-with-data" id="ghiChu">' + (feature.properties['ghiChu'] !== null ? autolinker.link(String(feature.properties['ghiChu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_CngtrnhCBKT_22_0(feature) {
+            switch(String(feature.properties['phanLoai'])) {
+                case 'Giếng thu':
+                    return {
+                pane: 'pane_CngtrnhCBKT_22',
+                radius: 6.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(54,202,164,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Miệng xả':
+                    return {
+                pane: 'pane_CngtrnhCBKT_22',
+                radius: 6.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(223,56,202,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_CngtrnhCBKT_22');
+        map.getPane('pane_CngtrnhCBKT_22').style.zIndex = 429;
+        map.getPane('pane_CngtrnhCBKT_22').style['mix-blend-mode'] = 'normal';
+        var layer_CngtrnhCBKT_22 = new L.geoJson(json_CngtrnhCBKT_22, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_CngtrnhCBKT_22',
+            layerName: 'layer_CngtrnhCBKT_22',
+            pane: 'pane_CngtrnhCBKT_22',
+            onEachFeature: pop_CngtrnhCBKT_22,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.shapeMarker(latlng, style_CngtrnhCBKT_22_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_CngtrnhCBKT_22);
+
+// Add Canh quan Layers
+///// Layer công trình
+        function pop_Cngtrnh_28(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">phanLoai</th>\
+                        <td class="visible-with-data" id="phanLoai">' + (feature.properties['phanLoai'] !== null ? autolinker.link(String(feature.properties['phanLoai']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ghiChu</th>\
+                        <td class="visible-with-data" id="ghiChu">' + (feature.properties['ghiChu'] !== null ? autolinker.link(String(feature.properties['ghiChu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Cngtrnh_28_0() {
+            return {
+                pane: 'pane_Cngtrnh_28',
+                opacity: 1,
+                color: 'rgba(247,247,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(181,140,94,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Cngtrnh_28');
+        map.getPane('pane_Cngtrnh_28').style.zIndex = 430;
+        map.getPane('pane_Cngtrnh_28').style['mix-blend-mode'] = 'normal';
+        var layer_Cngtrnh_28 = new L.geoJson(json_Cngtrnh_28, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Cngtrnh_28',
+            layerName: 'layer_Cngtrnh_28',
+            pane: 'pane_Cngtrnh_28',
+            onEachFeature: pop_Cngtrnh_28,
+            style: style_Cngtrnh_28_0,
+        });
+        bounds_group.addLayer(layer_Cngtrnh_28);
+        map.addLayer(layer_Cngtrnh_28);
+
+///// Layer cây xanh
+        function pop_Cyxanh_29(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">maDoiTuong</th>\
+                        <td class="visible-with-data" id="maDoiTuong">' + (feature.properties['maDoiTuong'] !== null ? autolinker.link(String(feature.properties['maDoiTuong']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">tenDoiTuon</th>\
+                        <td class="visible-with-data" id="tenDoiTuon">' + (feature.properties['tenDoiTuon'] !== null ? autolinker.link(String(feature.properties['tenDoiTuon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Cyxanh_29_0(feature) {
+            switch(String(feature.properties['phanLoai'])) {
+                case 'Bàng Cẩm Thạch':
+                    return {
+                pane: 'pane_Cyxanh_29',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(227,127,200,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Cau Đuôi Chồn':
+                    return {
+                pane: 'pane_Cyxanh_29',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(98,237,93,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Chiêu Liêu Nước':
+                    return {
+                pane: 'pane_Cyxanh_29',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(220,94,69,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Chuông Vàng':
+                    return {
+                pane: 'pane_Cyxanh_29',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(119,53,235,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Cóc':
+                    return {
+                pane: 'pane_Cyxanh_29',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(200,64,82,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Cốp Hoa Trắng':
+                    return {
+                pane: 'pane_Cyxanh_29',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(232,232,232,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Dừa':
+                    return {
+                pane: 'pane_Cyxanh_29',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(232,129,39,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Kè Nhật':
+                    return {
+                pane: 'pane_Cyxanh_29',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(85,211,119,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Long Não':
+                    return {
+                pane: 'pane_Cyxanh_29',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(204,255,141,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Mít':
+                    return {
+                pane: 'pane_Cyxanh_29',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(238,210,45,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Móng Bò Tím':
+                    return {
+                pane: 'pane_Cyxanh_29',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(157,24,231,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Móng Bò Trắng':
+                    return {
+                pane: 'pane_Cyxanh_29',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(226,226,164,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Muồng Hoa Đào':
+                    return {
+                pane: 'pane_Cyxanh_29',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(224,146,208,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Ngọc Lan':
+                    return {
+                pane: 'pane_Cyxanh_29',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(202,217,37,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Nhạc Ngựa':
+                    return {
+                pane: 'pane_Cyxanh_29',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(137,182,75,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Osaka Đỏ':
+                    return {
+                pane: 'pane_Cyxanh_29',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(228,38,38,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Sao Đen':
+                    return {
+                pane: 'pane_Cyxanh_29',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(21,57,39,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Tùng La Hán Việt':
+                    return {
+                pane: 'pane_Cyxanh_29',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(87,205,39,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Tùng Tháp':
+                    return {
+                pane: 'pane_Cyxanh_29',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(46,137,18,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Tường Vi':
+                    return {
+                pane: 'pane_Cyxanh_29',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(234,40,178,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Cyxanh_29');
+        map.getPane('pane_Cyxanh_29').style.zIndex = 431;
+        map.getPane('pane_Cyxanh_29').style['mix-blend-mode'] = 'normal';
+        var layer_Cyxanh_29 = new L.geoJson(json_Cyxanh_29, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Cyxanh_29',
+            layerName: 'layer_Cyxanh_29',
+            pane: 'pane_Cyxanh_29',
+            onEachFeature: pop_Cyxanh_29,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Cyxanh_29_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Cyxanh_29);
+
+////// Tạo nút chú giải layers
+        //// Tạo nút button 
+
+        var toggleBtn = L.control({position: 'topright'});
+        toggleBtn.onAdd = function(map) {
+            var div = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+            div.style.cursor = 'pointer';
+            div.style.backgroundColor = 'white';
+            div.style.width = '30px';
+            div.style.height = '30px';
+            div.style.textAlign = 'center';
+            div.style.lineHeight = '30px';
+
+            var img = L.DomUtil.create('img', '', div);
+            img.src = './css/images/layers-2x.png'; 
+            img.style.width = '30px';
+            img.style.height = '30px';
+
+
+            div.onclick = function(){
+                var controlContainer = document.getElementsByClassName('leaflet-control-layers')[0];
+                if (controlContainer.style.display === 'none') {
+                    controlContainer.style.display = 'block';
+                } else {
+                    controlContainer.style.display = 'none';
+                }
+            };
+            return div;
+        };
+        toggleBtn.addTo(map);
+
+// Create Panel checklist
+        var overlaysTree = [
+        {label: '<b>Cảnh quan</b>', collapsed: true, selectAllCheckbox: false, children: [
+            {label: 'Cây xanh<br /><table><tr><td style="text-align: center;"><img src="legend/Cyxanh_29_BàngCẩmThạch0.png" /></td><td>Bàng Cẩm Thạch</td></tr><tr><td style="text-align: center;"><img src="legend/Cyxanh_29_CauĐuôiChồn1.png" /></td><td>Cau Đuôi Chồn</td></tr><tr><td style="text-align: center;"><img src="legend/Cyxanh_29_ChiêuLiêuNước2.png" /></td><td>Chiêu Liêu Nước</td></tr><tr><td style="text-align: center;"><img src="legend/Cyxanh_29_ChuôngVàng3.png" /></td><td>Chuông Vàng</td></tr><tr><td style="text-align: center;"><img src="legend/Cyxanh_29_Cóc4.png" /></td><td>Cóc</td></tr><tr><td style="text-align: center;"><img src="legend/Cyxanh_29_CốpHoaTrắng5.png" /></td><td>Cốp Hoa Trắng</td></tr><tr><td style="text-align: center;"><img src="legend/Cyxanh_29_Dừa6.png" /></td><td>Dừa</td></tr><tr><td style="text-align: center;"><img src="legend/Cyxanh_29_KèNhật7.png" /></td><td>Kè Nhật</td></tr><tr><td style="text-align: center;"><img src="legend/Cyxanh_29_LongNão8.png" /></td><td>Long Não</td></tr><tr><td style="text-align: center;"><img src="legend/Cyxanh_29_Mít9.png" /></td><td>Mít</td></tr><tr><td style="text-align: center;"><img src="legend/Cyxanh_29_MóngBòTím10.png" /></td><td>Móng Bò Tím</td></tr><tr><td style="text-align: center;"><img src="legend/Cyxanh_29_MóngBòTrắng11.png" /></td><td>Móng Bò Trắng</td></tr><tr><td style="text-align: center;"><img src="legend/Cyxanh_29_MuồngHoaĐào12.png" /></td><td>Muồng Hoa Đào</td></tr><tr><td style="text-align: center;"><img src="legend/Cyxanh_29_NgọcLan13.png" /></td><td>Ngọc Lan</td></tr><tr><td style="text-align: center;"><img src="legend/Cyxanh_29_NhạcNgựa14.png" /></td><td>Nhạc Ngựa</td></tr><tr><td style="text-align: center;"><img src="legend/Cyxanh_29_OsakaĐỏ15.png" /></td><td>Osaka Đỏ</td></tr><tr><td style="text-align: center;"><img src="legend/Cyxanh_29_SaoĐen16.png" /></td><td>Sao Đen</td></tr><tr><td style="text-align: center;"><img src="legend/Cyxanh_29_TùngLaHánViệt17.png" /></td><td>Tùng La Hán Việt</td></tr><tr><td style="text-align: center;"><img src="legend/Cyxanh_29_TùngTháp18.png" /></td><td>Tùng Tháp</td></tr><tr><td style="text-align: center;"><img src="legend/Cyxanh_29_TườngVi19.png" /></td><td>Tường Vi</td></tr></table>', layer: layer_Cyxanh_29},
+            {label: '<img src="legend/Cngtrnh_28.png" /> Công trình', layer: layer_Cngtrnh_28},]},
+        {label: '<b>Chuẩn bị kỹ thuật</b>', collapsed: true, selectAllCheckbox: false, children: [
+            {label: 'Công trình CBKT<br /><table><tr><td style="text-align: center;"><img src="legend/CngtrnhCBKT_22_Giếngthu0.png" /></td><td>Giếng thu</td></tr><tr><td style="text-align: center;"><img src="legend/CngtrnhCBKT_22_Miệngxả1.png" /></td><td>Miệng xả</td></tr></table>', layer: layer_CngtrnhCBKT_22},
+            {label: '<img src="legend/Cngthotncma_21.png" /> Cống thoát nước mưa', layer: layer_Cngthotncma_21},
+            {label: '<img src="legend/Tuynthotncma_20.png" /> Tuyến thoát nước mưa', layer: layer_Tuynthotncma_20},
+            {label: '<img src="legend/Hngthotncma_19.png" /> Hướng thoát nước mưa', layer: layer_Hngthotncma_19},]},
+        {label: '<b>Thoát nước thải - Vệ sinh môi trường</b>', collapsed: true, selectAllCheckbox: false, children: [
+            {label: '<img src="legend/Cngthotncthi_18.png" /> Cống thoát nước thải', layer: layer_Cngthotncthi_18},
+            {label: 'Công trình TNT và VSMT<br /><table><tr><td style="text-align: center;"><img src="legend/CngtrnhTNTvVSMT_17_ĐiểmtrungchuyểnCTR0.png" /></td><td>Điểm trung chuyển CTR</td></tr><tr><td style="text-align: center;"><img src="legend/CngtrnhTNTvVSMT_17_Trạmxửlýnướcthải1.png" /></td><td>Trạm xử lý nước thải</td></tr></table>', layer: layer_CngtrnhTNTvVSMT_17},
+            {label: '<img src="legend/Hngthotncthi_16.png" /> Hướng thoát nước thải', layer: layer_Hngthotncthi_16},
+            {label: '<img src="legend/Bovmitrng_15.png" /> Bảo vệ môi trường', layer: layer_Bovmitrng_15},
+            {label: '<img src="legend/Tuynthotncthi_14.png" /> Tuyến thoát nước thải', layer: layer_Tuynthotncthi_14},]},
+        {label: '<b>Hạ tầng kỹ thuật khác</b>', collapsed: true, selectAllCheckbox: false, children: [
+            {label: '<img src="legend/CongTrinhChieuSang_P_13.png" /> CongTrinhChieuSang_P', layer: layer_CongTrinhChieuSang_P_13},
+            {label: 'CongTrinhThongTin_P<br /><table><tr><td style="text-align: center;"><img src="legend/CongTrinhThongTin_P_12_CộtĂnten0.png" /></td><td>Cột Ăn ten</td></tr><tr><td style="text-align: center;"><img src="legend/CongTrinhThongTin_P_12_Tủphốiquang1.png" /></td><td>Tủ phối quang</td></tr></table>', layer: layer_CongTrinhThongTin_P_12},
+            {label: 'CongtrinhCapNuocPCCC_P<br /><table><tr><td style="text-align: center;"><img src="legend/CongtrinhCapNuocPCCC_P_11_Đàinướcbểnước0.png" /></td><td>Đài nước, bể nước</td></tr><tr><td style="text-align: center;"><img src="legend/CongtrinhCapNuocPCCC_P_11_Trạmbơmtăngáp1.png" /></td><td>Trạm bơm tăng áp</td></tr><tr><td style="text-align: center;"><img src="legend/CongtrinhCapNuocPCCC_P_11_Trụcứuhỏa2.png" /></td><td>Trụ cứu hỏa</td></tr></table>', layer: layer_CongtrinhCapNuocPCCC_P_11},
+            {label: 'CongTrinhCapDien_P<br /><table><tr><td style="text-align: center;"><img src="legend/CongTrinhCapDien_P_10_Trạmhạthế0.png" /></td><td>Trạm hạ thế</td></tr><tr><td style="text-align: center;"><img src="legend/CongTrinhCapDien_P_10_Tủđiện1.png" /></td><td>Tủ điện</td></tr></table>', layer: layer_CongTrinhCapDien_P_10},
+            {label: 'MangLuoiPhanPhoiDien_L<br /><table><tr><td style="text-align: center;"><img src="legend/MangLuoiPhanPhoiDien_L_9_Tuyếnđiệnngầmhạthế0.png" /></td><td>Tuyến điện ngầm hạ thế</td></tr><tr><td style="text-align: center;"><img src="legend/MangLuoiPhanPhoiDien_L_9_Tuyếnđiệnngầmtrungthế1.png" /></td><td>Tuyến điện ngầm trung thế</td></tr><tr><td style="text-align: center;"><img src="legend/MangLuoiPhanPhoiDien_L_9_Tuyếnđiệnnổitrungthế2.png" /></td><td>Tuyến điện nổi trung thế</td></tr></table>', layer: layer_MangLuoiPhanPhoiDien_L_9},
+            {label: '<img src="legend/MangLuoiChieuSang_L_8.png" /> MangLuoiChieuSang_L', layer: layer_MangLuoiChieuSang_L_8},
+            {label: '<img src="legend/MangLuoiCapThongTin_L_7.png" /> MangLuoiCapThongTin_L', layer: layer_MangLuoiCapThongTin_L_7},
+            {label: '<img src="legend/MangLuoiCapNuoc_L_6.png" /> MangLuoiCapNuoc_L', layer: layer_MangLuoiCapNuoc_L_6},]},
+	{label: '<b>Sử dụng đất - Giao thông</b>', collapsed: true, selectAllCheckbox: false, children: [
+            {label: '<img src="legend/Chcnngcngtrnh_27.png" /> Chức năng công trình', layer: layer_Chcnngcngtrnh_27},
+            {label: 'Chỉ giới xây dựng<br /><table><tr><td style="text-align: center;"><img src="legend/Chgiixydng_26_Khoảnglùi0m0.png" /></td><td>Khoảng lùi 0m</td></tr><tr><td style="text-align: center;"><img src="legend/Chgiixydng_26_Khoảnglùi10m1.png" /></td><td>Khoảng lùi 10m</td></tr><tr><td style="text-align: center;"><img src="legend/Chgiixydng_26_Khoảnglùi2m2.png" /></td><td>Khoảng lùi 2m</td></tr><tr><td style="text-align: center;"><img src="legend/Chgiixydng_26_Khoảnglùi5m3.png" /></td><td>Khoảng lùi 5m</td></tr><tr><td style="text-align: center;"><img src="legend/Chgiixydng_26_Khoảnglùi6m4.png" /></td><td>Khoảng lùi 6m</td></tr></table>', layer: layer_Chgiixydng_26},
+            {label: '<img src="legend/Bva_25.png" /> Bó vỉa', layer: layer_Bva_25},
+            {label: '<img src="legend/Timng_24.png" /> Tim đường', layer: layer_Timng_24},
+            {label: 'Chức năng SDD<br /><table><tr><td style="text-align: center;"><img src="legend/ChcnngSDD_23_Đấtbãiđỗxe0.png" /></td><td>Đất bãi đỗ xe</td></tr><tr><td style="text-align: center;"><img src="legend/ChcnngSDD_23_Đấtcâyxanhsửdụngcôngcộng1.png" /></td><td>Đất cây xanh sử dụng công cộng</td></tr><tr><td style="text-align: center;"><img src="legend/ChcnngSDD_23_Đấtcâyxanhsửdụnghạnchế2.png" /></td><td>Đất cây xanh sử dụng hạn chế</td></tr><tr><td style="text-align: center;"><img src="legend/ChcnngSDD_23_Đấtchưasửdụng3.png" /></td><td>Đất chưa sử dụng</td></tr><tr><td style="text-align: center;"><img src="legend/ChcnngSDD_23_Đấtcôngtrìnhhạtầngkỹthuậtkhác4.png" /></td><td>Đất công trình hạ tầng kỹ thuật khác</td></tr><tr><td style="text-align: center;"><img src="legend/ChcnngSDD_23_Đấtcôngtrìnhhạtầngxãhội5.png" /></td><td>Đất công trình hạ tầng xã hội</td></tr><tr><td style="text-align: center;"><img src="legend/ChcnngSDD_23_Đấtđườnggiaothông6.png" /></td><td>Đất đường giao thông</td></tr><tr><td style="text-align: center;"><img src="legend/ChcnngSDD_23_Đấtnhàchungcư7.png" /></td><td>Đất nhà chung cư</td></tr><tr><td style="text-align: center;"><img src="legend/ChcnngSDD_23_Đấtnhàởliềnkề8.png" /></td><td>Đất nhà ở liền kề</td></tr><tr><td style="text-align: center;"><img src="legend/ChcnngSDD_23_Đấtthểdụcthểthao9.png" /></td><td>Đất thể dục thể thao</td></tr><tr><td style="text-align: center;"><img src="legend/ChcnngSDD_23_Đấtnghiêncứuđàotạo10.png" /></td><td>Đất nghiên cứu đào tạo</td></tr><tr><td style="text-align: center;"><img src="legend/ChcnngSDD_23_Hồaođầm11.png" /></td><td>Hồ, ao, đầm</td></tr></table>', layer: layer_ChcnngSDD_23},]},
+  	{label: '<b>Nền địa hình - Mốc giới - Vị trí</b>', collapsed: true, selectAllCheckbox: false, children: [
+            {label: '<img src="legend/immcgii_33.png" /> Điểm mốc giới', layer: layer_immcgii_33},
+            {label: 'Đường đồng mức<br /><table><tr><td style="text-align: center;"><img src="legend/ngngmc_32_Đồngmứccái0.png" /></td><td>Đồng mức cái</td></tr><tr><td style="text-align: center;"><img src="legend/ngngmc_32_Đồngmứccon1.png" /></td><td>Đồng mức con</td></tr></table>', layer: layer_ngngmc_32},
+            {label: '<img src="legend/Ranhquyhoch_31.png" /> Ranh quy hoạch', layer: layer_Ranhquyhoch_31},
+            {label: 'Ranh dự án liên quan<br /><table><tr><td style="text-align: center;"><img src="legend/Ranhdnlinquan_30_RanhQHC0.png" /></td><td>Ranh QHC</td></tr><tr><td style="text-align: center;"><img src="legend/Ranhdnlinquan_30_RanhQHCTCũ1.png" /></td><td>Ranh QHCT (Cũ)</td></tr></table>', layer: layer_Ranhdnlinquan_30},]},
+       {label: '<b>GeoTIFF</b>', collapsed: true, selectAllCheckbox: false, children: [
+            {label: "BDDANHGIAHIENTRANG", layer: layer_BDDANHGIAHIENTRANG_5},
+            {label: "BDQUYHOACHSDD", layer: layer_BDQUYHOACHSDD_4},
+            {label: "BDKHONGGIANKIENTRUCCANHQUAN", layer: layer_BDKHONGGIANKIENTRUCCANHQUAN_3},
+            {label: "BDQUYHOACHTONGHOPDUONGONG", layer: layer_BDQUYHOACHTONGHOPDUONGONG_2},]},
+            {label: "Google Satellite", layer: layer_GoogleSatellite_1, radioGroup: 'bm' },
+            {label: "OpenStreetMap", layer: layer_OpenStreetMap_0, radioGroup: 'bm' },]
+
+        var lay = L.control.layers.tree(null, overlaysTree,{
+            //namedToggle: true,
+            //selectorBack: false,
+            //closedSymbol: '&#8862; &#x1f5c0;',
+            //openedSymbol: '&#8863; &#x1f5c1;',
+            //collapseAll: 'Collapse all',
+            //expandAll: 'Expand all',
+            collapsed: false,
+        });
+        lay.addTo(map);
+        setBounds();
+
+// Create Text layer
+        var i = 0;
+        layer_Timng_24.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['tenDoiTuon'] !== null?String('<div style="color: #e80000; font-size: 12pt; font-weight: bold; font-family: \'Open Sans\', sans-serif;">' + layer.feature.properties['tenDoiTuon']) + '</div>':''), {permanent: true, offset: [0, -2], className: 'css_Timng_24'});  
+	    labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        var i = 0;
+        layer_Chcnngcngtrnh_27.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['tenDoiTuon'] !== null?String('<div style="color: #000000; font-size: 10pt; font-weight: bold; font-family: \'Open Sans\', sans-serif;">' + layer.feature.properties['tenDoiTuon']) + '</div>':''), {permanent: true, offset: [0, 0], className: 'css_Chcnngcngtrnh_27'});
+	    labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        var i = 0;
+        layer_ngngmc_32.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['tenDoiTuon'] !== null?String('<div style="color: #323232; font-size: 10pt; font-weight: bold; font-family: \'Open Sans\', sans-serif;">' + layer.feature.properties['tenDoiTuon']) + '</div>':''), {permanent: true, offset: [0, 0], className: 'css_ngngmc_32'});
+	    labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        var i = 0;
+        layer_immcgii_33.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['tenDoiTuon'] !== null?String('<div style="color: #323232; font-size: 15pt; font-weight: bold; font-family: \'Open Sans\', sans-serif;">' + layer.feature.properties['tenDoiTuon']) + '</div>':''), {permanent: true, offset: [-0, -5], className: 'css_immcgii_33'});
+	    labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        L.ImageOverlay.include({
+            getBounds: function () {
+                return this._bounds;
+            }
+        });
+   	resetLabels([layer_Timng_24,layer_Chcnngcngtrnh_27,layer_ngngmc_32,layer_immcgii_33]);
+	map.on("zoomend", function(){
+	resetLabels([layer_Timng_24,layer_Chcnngcngtrnh_27,layer_ngngmc_32,layer_immcgii_33]);
+	});
+	map.on("layeradd", function()
+	{resetLabels([layer_Timng_24,layer_Chcnngcngtrnh_27,layer_ngngmc_32,layer_immcgii_33]); 
+	});
+	map.on("layerremove", function()
+	{ resetLabels([layer_Timng_24,layer_Chcnngcngtrnh_27,layer_ngngmc_32,layer_immcgii_33]);
+	});	
+        </script>
+    </body>
+</html>
